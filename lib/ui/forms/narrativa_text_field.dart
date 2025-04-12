@@ -28,7 +28,7 @@ class NarrativaTextField extends StatelessWidget {
         labelText: labelText,
         hintText: hintText,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(borderRadius ?? 12.0),
+          borderRadius: BorderRadius.circular(borderRadius ?? 16.0),
         ),
       ),
       keyboardType: textInputType,

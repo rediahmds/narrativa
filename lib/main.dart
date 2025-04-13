@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:narrativa/routes/routes.dart';
 import 'package:narrativa/services/services.dart';
@@ -8,6 +9,11 @@ void main() async {
   final prefs = await SharedPreferences.getInstance();
 
   runApp(App(prefs: prefs));
+
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(systemNavigationBarColor: Colors.transparent),
+  );
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
 }
 
 class App extends StatefulWidget {

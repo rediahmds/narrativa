@@ -16,7 +16,7 @@ class RegisterScreen extends StatelessWidget {
     return Scaffold(
       body: Center(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -32,11 +32,11 @@ class RegisterScreen extends StatelessWidget {
                 ),
               ),
               RegisterForm(),
-              FilledButton.tonal(
+              FilledButton(
                 onPressed: () => onRegister(),
                 child: const Text('Register'),
               ),
-              OutlinedButton(
+              TextButton(
                 onPressed: () => onLogin(),
                 child: const Text('Login'),
               ),

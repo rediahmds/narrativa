@@ -2,9 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:narrativa/screens/screens.dart';
 
 class RegisterScreen extends StatelessWidget {
-  const RegisterScreen({super.key, required this.onRegister});
+  const RegisterScreen({
+    super.key,
+    required this.onRegister,
+    required this.onLogin,
+  });
 
   final Function onRegister;
+  final Function onLogin;
 
   @override
   Widget build(BuildContext context) {
@@ -30,6 +35,10 @@ class RegisterScreen extends StatelessWidget {
               FilledButton.tonal(
                 onPressed: () => onRegister(),
                 child: const Text('Register'),
+              ),
+              OutlinedButton(
+                onPressed: () => onLogin(),
+                child: const Text('Login'),
               ),
             ],
           ),

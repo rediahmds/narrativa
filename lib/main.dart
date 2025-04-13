@@ -1,36 +1,38 @@
 import 'package:flutter/material.dart';
-import 'package:narrativa/screens/screens.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:narrativa/routes/routes.dart';
+import 'package:narrativa/services/services.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final prefs = await SharedPreferences.getInstance();
+
+  runApp(App(prefs: prefs));
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class App extends StatefulWidget {
+  const App({super.key, required this.prefs});
+
+  final SharedPreferences prefs;
+
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Narrativa',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber),
-      ),
-      home: const MyHomePage(title: 'Narrativa Home Page'),
-    );
+  State<App> createState() => _AppState();
+}
+
+class _AppState extends State<App> {
+  late AppRouter appRouter;
+  late SessionService sessionService;
+
+  @override
+  void initState() {
+    sessionService = SessionService(prefs: widget.prefs);
+    appRouter = AppRouter(sessionService);
+
+    super.initState();
   }
-}
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
-    return RegisterScreen(onRegister: () {});
+    return MaterialApp.router(routerConfig: appRouter.goRouter);
   }
 }

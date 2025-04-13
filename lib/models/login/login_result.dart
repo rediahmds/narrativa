@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 class LoginResult {
-  final String userId;
+  final String? userId;
   final String name;
   final String token;
 

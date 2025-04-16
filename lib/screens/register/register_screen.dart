@@ -31,15 +31,7 @@ class RegisterScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              RegisterForm(),
-              FilledButton(
-                onPressed: () => onRegister(),
-                child: const Text('Register'),
-              ),
-              TextButton(
-                onPressed: () => onLogin(),
-                child: const Text('Login'),
-              ),
+              RegisterForm(onRegister: onRegister, onLogin: onLogin),
             ],
           ),
         ),

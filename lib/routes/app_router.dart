@@ -34,6 +34,10 @@ class AppRouter {
               },
             ),
       ),
+      GoRoute(
+        path: AppPaths.stories.path,
+        builder: (context, state) => StoriesScreen(),
+      ),
     ],
     redirect: (context, state) async {
       final session = await _sessionService.loadSession();
@@ -44,6 +48,7 @@ class AppRouter {
           state.matchedLocation != AppPaths.register.path) {
         return AppPaths.login.path;
       }
+
       return null;
     },
   );

@@ -10,6 +10,7 @@ class NarrativaTextField extends StatelessWidget {
     this.hintText,
     this.obscureText,
     this.borderRadius,
+    this.autovalidateMode,
   });
 
   final TextEditingController controller;
@@ -19,6 +20,7 @@ class NarrativaTextField extends StatelessWidget {
   final FormFieldValidator<String>? validator;
   final bool? obscureText;
   final double? borderRadius;
+  final AutovalidateMode? autovalidateMode;
 
   @override
   Widget build(BuildContext context) {
@@ -34,6 +36,7 @@ class NarrativaTextField extends StatelessWidget {
       keyboardType: textInputType,
       validator: validator,
       obscureText: obscureText ?? false,
+      autovalidateMode: autovalidateMode ?? AutovalidateMode.disabled,
     );
   }
 }

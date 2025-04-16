@@ -10,7 +10,7 @@ class ApiService {
       AppPaths.register.path,
       data: payload.toJson(),
     );
-    return RegisterResponse.fromJson(response.data);
+    return RegisterResponse.fromJson(response.toString());
   }
 
   Future<LoginResponse> login(LoginPayload payload) async {

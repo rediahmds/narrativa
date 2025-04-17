@@ -74,6 +74,7 @@ class _RegisterFormState extends State<RegisterForm> {
             hintText: "Must be at least 8 characters",
             textInputType: TextInputType.visiblePassword,
             obscureText: true,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
             validator: (password) {
               if (password == null || password.isEmpty) {
                 return 'Password is required';
@@ -83,7 +84,6 @@ class _RegisterFormState extends State<RegisterForm> {
               }
               return null;
             },
-            autovalidateMode: AutovalidateMode.onUserInteraction,
           ),
           Consumer<SessionProvider>(
             builder: (_, sessionProvider, _) {

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:narrativa/providers/providers.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:narrativa/routes/routes.dart';
 import 'package:narrativa/services/services.dart';
@@ -39,6 +41,19 @@ class _AppState extends State<App> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(routerConfig: appRouter.goRouter);
+    return MultiProvider(
+      providers: [
+        Provider(create: (context) => ApiService()),
+        Provider(create: (context) => sessionService),
+        ChangeNotifierProvider(
+          create:
+              (context) => SessionProvider(
+                sessionService: sessionService,
+                apiService: context.read<ApiService>(),
+              ),
+        ),
+      ],
+      child: MaterialApp.router(routerConfig: appRouter.goRouter),
+    );
   }
 }

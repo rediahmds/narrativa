@@ -23,15 +23,7 @@ class LoginScreen extends StatelessWidget {
             spacing: 20,
             children: [
               Center(child: const Text('Welcome to Narrativa!')),
-              LoginForm(),
-              FilledButton(
-                onPressed: () => onLogin(),
-                child: const Text('Login'),
-              ),
-              OutlinedButton(
-                onPressed: () => onRegister(),
-                child: const Text('Register'),
-              ),
+              LoginForm(onLogin: onLogin, onRegister: onRegister),
             ],
           ),
         ),

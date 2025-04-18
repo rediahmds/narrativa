@@ -14,7 +14,7 @@ class SessionService {
     await prefs.setString(_nameKey, loginResult.name);
   }
 
-  Future<LoginResult?> loadSession() async {
+  LoginResult? loadSession() {
     final token = prefs.getString(_tokenKey);
     final name = prefs.getString(_nameKey);
 

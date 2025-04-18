@@ -27,7 +27,7 @@ class AppRouter {
         builder:
             (context, state) => RegisterScreen(
               onRegister: () {
-                context.go(AppPaths.stories.path);
+                context.go(AppPaths.home.path);
               },
               onLogin: () {
                 context.go(AppPaths.login.path);

@@ -5,7 +5,9 @@ import 'package:narrativa/services/services.dart';
 import 'package:narrativa/static/static.dart';
 
 class SessionProvider extends ChangeNotifier {
-  SessionProvider({required this.sessionService, required this.apiService});
+  SessionProvider({required this.sessionService, required this.apiService}) {
+    _init();
+  }
 
   final SessionService sessionService;
   final ApiService apiService;
@@ -13,13 +15,24 @@ class SessionProvider extends ChangeNotifier {
   SessionState _state = SessionState();
   SessionState get state => _state;
 
+  Future<void> _init() async {
+    final session = sessionService.loadSession();
+    if (session != null) {
+      updateState(
+        state.copyWith(status: SessionStatus.loggedIn, loginResult: session),
+      );
+    } else {
+      updateState(state.copyWith(status: SessionStatus.initial));
+    }
+  }
+
   Future<bool> register(RegisterPayload payload) async {
-    _updateState(state.copyWith(status: SessionStatus.loadingRegister));
+    updateState(state.copyWith(status: SessionStatus.loadingRegister));
     try {
       final registerResult = await apiService.register(payload);
 
       if (registerResult.error) {
-        _updateState(
+        updateState(
           state.copyWith(
             status: SessionStatus.error,
             errorMessage: registerResult.message,
@@ -35,7 +48,7 @@ class SessionProvider extends ChangeNotifier {
       );
       final isLoggedIn = await login(loginPayload);
       if (!isLoggedIn) {
-        _updateState(
+        updateState(
           state.copyWith(
             status: SessionStatus.error,
             errorMessage: "Failed to login after registration.",
@@ -47,7 +60,7 @@ class SessionProvider extends ChangeNotifier {
 
       return true;
     } on DioException catch (de) {
-      _updateState(
+      updateState(
         state.copyWith(
           status: SessionStatus.error,
           errorMessage: apiService.parseDioException(de),
@@ -56,7 +69,7 @@ class SessionProvider extends ChangeNotifier {
 
       return false;
     } catch (e) {
-      _updateState(
+      updateState(
         state.copyWith(status: SessionStatus.error, errorMessage: e.toString()),
       );
 
@@ -65,12 +78,12 @@ class SessionProvider extends ChangeNotifier {
   }
 
   Future<bool> login(LoginPayload payload) async {
-    _updateState(state.copyWith(status: SessionStatus.loadingLogin));
+    updateState(state.copyWith(status: SessionStatus.loadingLogin));
     try {
       final login = await apiService.login(payload);
 
       if (login.error) {
-        _updateState(
+        updateState(
           state.copyWith(
             status: SessionStatus.error,
             errorMessage: login.message,
@@ -82,7 +95,7 @@ class SessionProvider extends ChangeNotifier {
 
       final loginResult = login.loginResult;
       await sessionService.saveSession(loginResult);
-      _updateState(
+      updateState(
         state.copyWith(
           status: SessionStatus.loggedIn,
           loginResult: loginResult,
@@ -91,7 +104,7 @@ class SessionProvider extends ChangeNotifier {
 
       return true;
     } on DioException catch (de) {
-      _updateState(
+      updateState(
         state.copyWith(
           status: SessionStatus.error,
           errorMessage: apiService.parseDioException(de),
@@ -100,7 +113,7 @@ class SessionProvider extends ChangeNotifier {
 
       return false;
     } catch (e) {
-      _updateState(
+      updateState(
         state.copyWith(status: SessionStatus.error, errorMessage: e.toString()),
       );
 
@@ -108,7 +121,7 @@ class SessionProvider extends ChangeNotifier {
     }
   }
 
-  void _updateState(SessionState state) {
+  void updateState(SessionState state) {
     _state = state;
     notifyListeners();
   }

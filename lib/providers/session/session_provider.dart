@@ -68,7 +68,7 @@ class SessionProvider extends ChangeNotifier {
     _updateState(state.copyWith(status: SessionStatus.loadingLogin));
     try {
       final login = await apiService.login(payload);
-      
+
       if (login.error) {
         _updateState(
           state.copyWith(

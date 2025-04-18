@@ -45,6 +45,7 @@ class _RegisterFormState extends State<RegisterForm> {
             labelText: "Name",
             hintText: "e.g. Kylian Mbappé",
             textInputType: TextInputType.name,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return 'Name cannot be empty';
@@ -58,6 +59,7 @@ class _RegisterFormState extends State<RegisterForm> {
             labelText: "Email",
             hintText: "e.g. kylian.mbappe@gmail.com",
             textInputType: TextInputType.emailAddress,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return 'Email cannot be empty';
@@ -87,51 +89,50 @@ class _RegisterFormState extends State<RegisterForm> {
           ),
           Consumer<SessionProvider>(
             builder: (_, sessionProvider, _) {
-              final sessionStatus = sessionProvider.state.status;
+              switch (sessionProvider.state.status) {
+                case SessionStatus.loadingLogin:
+                case SessionStatus.loadingRegister:
+                  return const Center(child: CircularProgressIndicator());
 
-              if (sessionStatus == SessionStatus.loadingLogin ||
-                  sessionStatus == SessionStatus.loadingRegister) {
-                return const Center(child: CircularProgressIndicator());
+                default:
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    spacing: 12,
+                    children: [
+                      FilledButton(
+                        onPressed: () async {
+                          final payload = RegisterPayload(
+                            name: nameController.text,
+                            email: emailController.text,
+                            password: passwordController.text,
+                          );
+
+                          final isSuccess = await sessionProvider.register(
+                            payload,
+                          );
+
+                          if (isSuccess) {
+                            widget.onRegister();
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  sessionProvider.state.errorMessage ??
+                                      "Unknown error",
+                                ),
+                              ),
+                            );
+                          }
+                        },
+                        child: const Text('Register'),
+                      ),
+                      TextButton(
+                        onPressed: () => widget.onLogin(),
+                        child: const Text('Login'),
+                      ),
+                    ],
+                  );
               }
-
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  FilledButton(
-                    onPressed: () async {
-                      final payload = RegisterPayload(
-                        name: nameController.text,
-                        email: emailController.text,
-                        password: passwordController.text,
-                      );
-
-                      await sessionProvider.register(payload);
-                      debugPrint(
-                        "Session status: ${sessionProvider.state.status}",
-                      );
-
-                      if (sessionProvider.state.status ==
-                          SessionStatus.loggedIn) {
-                        widget.onRegister();
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              sessionProvider.state.errorMessage ??
-                                  "Unknown error",
-                            ),
-                          ),
-                        );
-                      }
-                    },
-                    child: const Text('Register'),
-                  ),
-                  TextButton(
-                    onPressed: () => widget.onLogin(),
-                    child: const Text('Login'),
-                  ),
-                ],
-              );
             },
           ),
         ],

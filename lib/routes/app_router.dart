@@ -35,12 +35,18 @@ class AppRouter {
             ),
       ),
       GoRoute(
-        path: AppPaths.stories.path,
-        builder: (context, state) => StoriesScreen(),
+        path: AppPaths.home.path,
+        builder:
+            (context, state) => StoriesScreen(
+              onLogout: () async {
+                await _sessionService.clearSession();
+                context.go(AppPaths.login.path);
+              },
+            ),
       ),
     ],
     redirect: (context, state) async {
-      final session = await _sessionService.loadSession();
+      final session = _sessionService.loadSession();
       final isLoggedIn = session != null;
 
       if (!isLoggedIn &&

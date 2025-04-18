@@ -26,6 +26,6 @@ class SessionState {
 
   @override
   String toString() {
-    return 'SessionState(status: $status, loginResult: $loginResult, errorMessage: $errorMessage)';
+    return "SessionState(status: $status, loginResult: $loginResult, errorMessage: $errorMessage)";
   }
 }

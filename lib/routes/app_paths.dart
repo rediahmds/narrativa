@@ -1,7 +1,8 @@
 enum AppPaths {
   register("/register"),
   login("/login"),
-  stories("/");
+  home("/"),
+  stories("/stories");
 
   final String path;
   const AppPaths(this.path);

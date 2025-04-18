@@ -21,6 +21,23 @@ class ApiService {
     return LoginResponse.fromJson(response.toString());
   }
 
+  Future<StoriesResponse> getStories({
+    required String token,
+    int? page,
+    int? size,
+  }) async {
+    final response = await _dio.get(
+      AppPaths.stories.path,
+      queryParameters: {
+        if (page != null) "page": page,
+        if (size != null) "size": size,
+      },
+      options: Options(headers: {"Authorization": "Bearer $token"}),
+    );
+
+    return StoriesResponse.fromJson(response.toString());
+  }
+
   String parseDioException(DioException dioException) {
     switch (dioException.type) {
       case DioExceptionType.connectionTimeout:

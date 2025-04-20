@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';
 import 'package:narrativa/services/services.dart';
 import 'package:narrativa/static/static.dart';
@@ -29,6 +30,13 @@ class StoriesProvider extends ChangeNotifier {
         state.copyWith(
           status: StoriesStatus.loaded,
           stories: storiesResult.listStory,
+        ),
+      );
+    } on DioException catch (de) {
+      _updateState(
+        state.copyWith(
+          status: StoriesStatus.error,
+          errorMessage: apiService.parseDioException(de),
         ),
       );
     } catch (e) {

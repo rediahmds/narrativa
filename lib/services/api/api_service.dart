@@ -38,6 +38,18 @@ class ApiService {
     return StoriesResponse.fromJson(response.toString());
   }
 
+  Future<StoryDetailResponse> getStoryDetail({
+    required String token,
+    required String id,
+  }) async {
+    final response = await _dio.get(
+      "${AppPaths.stories.path}/$id",
+      options: Options(headers: {"Authorization": "Bearer $token"}),
+    );
+
+    return StoryDetailResponse.fromJson(response.toString());
+  }
+
   String parseDioException(DioException dioException) {
     switch (dioException.type) {
       case DioExceptionType.connectionTimeout:

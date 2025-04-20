@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:narrativa/models/models.dart';
+import 'package:narrativa/utils/utils.dart';
 
 class StoryCardWidget extends StatelessWidget {
   const StoryCardWidget({super.key, required this.story, required this.onTap});
@@ -43,7 +44,9 @@ class StoryCardWidget extends StatelessWidget {
                   children: [
                     Text(
                       story.name,
-                      style: Theme.of(context).textTheme.titleMedium,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                     Text(
                       story.description,
@@ -52,13 +55,18 @@ class StoryCardWidget extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
-                      'Created at: ${story.createdAt.toLocal()}',
-                      style: Theme.of(context).textTheme.bodyMedium,
+                      JiffyFormat.relativeTime(
+                        story.createdAt.toIso8601String(),
+                      ),
+                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                        fontWeight: FontWeight.normal,
+                      ),
                     ),
                     if (story.lat != null && story.lon != null)
                       Text(
                         'Location: ${story.lat}, ${story.lon}',
-                        style: Theme.of(context).textTheme.bodyMedium,
+                        style: Theme.of(context).textTheme.labelMedium
+                            ?.copyWith(fontWeight: FontWeight.normal),
                       ),
                   ],
                 ),

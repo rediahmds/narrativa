@@ -50,8 +50,12 @@ class AppRouter {
           GoRoute(
             path: "${AppPaths.stories.path}/:id",
             builder:
-                (context, state) =>
-                    DetailScreen(storyId: state.pathParameters["id"]!),
+                (context, state) => DetailScreen(
+                  storyId: state.pathParameters["id"]!,
+                  onLogout: () {
+                    context.go(AppPaths.login.path);
+                  },
+                ),
           ),
         ],
       ),

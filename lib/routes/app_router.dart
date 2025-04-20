@@ -42,7 +42,18 @@ class AppRouter {
                 await _sessionService.clearSession();
                 context.go(AppPaths.login.path);
               },
+              onStoryTap: (String storyId) {
+                context.go("${AppPaths.stories.path}/$storyId");
+              },
             ),
+        routes: [
+          GoRoute(
+            path: "${AppPaths.stories.path}/:id",
+            builder:
+                (context, state) =>
+                    DetailScreen(storyId: state.pathParameters["id"]!),
+          ),
+        ],
       ),
     ],
     redirect: (context, state) async {

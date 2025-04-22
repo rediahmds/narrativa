@@ -39,7 +39,23 @@ class _StoriesScreenState extends State<StoriesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Stories')),
+      appBar: AppBar(
+        title: const Text('Stories'),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            color: Colors.red,
+            tooltip: "Logout",
+            onPressed: () async {
+              final sessionProvider = context.read<SessionProvider>();
+              await sessionProvider.logout();
+
+              widget.onLogout();
+            },
+          ),
+        ],
+      ),
       body: Consumer<StoriesProvider>(
         builder: (_, storiesProvider, _) {
           switch (storiesProvider.state.status) {

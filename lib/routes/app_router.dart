@@ -9,13 +9,14 @@ class AppRouter {
   final SessionService _sessionService;
 
   late final GoRouter router = GoRouter(
+    initialLocation: AppPaths.stories.path,
     routes: [
       GoRoute(
         path: AppPaths.login.path,
         builder:
             (context, state) => LoginScreen(
               onLogin: () {
-                context.go(AppPaths.home.path);
+                context.go(AppPaths.stories.path);
               },
               onRegister: () {
                 context.go(AppPaths.register.path);
@@ -27,7 +28,7 @@ class AppRouter {
         builder:
             (context, state) => RegisterScreen(
               onRegister: () {
-                context.go(AppPaths.home.path);
+                context.go(AppPaths.stories.path);
               },
               onLogin: () {
                 context.go(AppPaths.login.path);
@@ -35,7 +36,7 @@ class AppRouter {
             ),
       ),
       GoRoute(
-        path: AppPaths.home.path,
+        path: AppPaths.stories.path,
         builder:
             (context, state) => StoriesScreen(
               onLogout: () async {
@@ -45,10 +46,14 @@ class AppRouter {
               onStoryTap: (String storyId) {
                 context.go("${AppPaths.stories.path}/$storyId");
               },
+              onAddStory: () {
+                context.go("${AppPaths.stories.path}/add");
+              },
             ),
         routes: [
+          GoRoute(path: "/add", builder: (context, state) => AddStoryScreen()),
           GoRoute(
-            path: "${AppPaths.stories.path}/:id",
+            path: "/:id",
             builder:
                 (context, state) => DetailScreen(
                   storyId: state.pathParameters["id"]!,

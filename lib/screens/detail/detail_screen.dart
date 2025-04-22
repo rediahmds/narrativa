@@ -110,7 +110,7 @@ class _DetailScreenState extends State<DetailScreen> {
                     ),
                     TextButton.icon(
                       onPressed: () {
-                        context.go(AppPaths.home.path);
+                        context.go(AppPaths.stories.path);
                       },
                       label: const Text("Go Back"),
                       icon: const Icon(Icons.arrow_back),

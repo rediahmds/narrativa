@@ -1,7 +1,6 @@
 enum AppPaths {
   register("/register"),
   login("/login"),
-  home("/"),
   stories("/stories");
 
   final String path;

@@ -121,6 +121,27 @@ class SessionProvider extends ChangeNotifier {
     }
   }
 
+  Future<bool> logout() async {
+    updateState(state.copyWith(status: SessionStatus.loadingLogout));
+
+    try {
+      final isLoggedOut = await sessionService.clearSession();
+
+      if (!isLoggedOut) {
+        throw Exception("Failed to logout.");
+      }
+
+      updateState(state.copyWith(status: SessionStatus.initial));
+      return true;
+    } catch (e) {
+      updateState(
+        state.copyWith(status: SessionStatus.error, errorMessage: e.toString()),
+      );
+
+      return false;
+    }
+  }
+
   void updateState(SessionState state) {
     _state = state;
     notifyListeners();

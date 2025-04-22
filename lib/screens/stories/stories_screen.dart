@@ -9,9 +9,11 @@ class StoriesScreen extends StatefulWidget {
     super.key,
     required this.onLogout,
     required this.onStoryTap,
+    required this.onAddStory,
   });
 
   final Function onLogout;
+  final Function onAddStory;
   final void Function(String) onStoryTap;
 
   @override
@@ -93,7 +95,7 @@ class _StoriesScreenState extends State<StoriesScreen> {
         padding: const EdgeInsets.only(right: 16.0, bottom: 16.0),
         child: FloatingActionButton(
           onPressed: () {
-            debugPrint("Add Story button pressed");
+            widget.onAddStory();
           },
           tooltip: "Add Story",
           child: const Icon(Icons.add),

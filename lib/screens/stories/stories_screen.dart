@@ -89,6 +89,16 @@ class _StoriesScreenState extends State<StoriesScreen> {
           }
         },
       ),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(right: 16.0, bottom: 16.0),
+        child: FloatingActionButton(
+          onPressed: () {
+            debugPrint("Add Story button pressed");
+          },
+          tooltip: "Add Story",
+          child: const Icon(Icons.add),
+        ),
+      ),
     );
   }
 }

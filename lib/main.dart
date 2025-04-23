@@ -58,6 +58,7 @@ class _AppState extends State<App> {
         ChangeNotifierProvider(
           create: (context) => DetailProvider(context.read<ApiService>()),
         ),
+        ChangeNotifierProvider(create: (context) => AddStoryProvider()),
       ],
       child: MaterialApp.router(routerConfig: appRouter.goRouter),
     );

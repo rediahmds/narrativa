@@ -69,6 +69,19 @@ class _DetailScreenState extends State<DetailScreen> {
                           placeholderFit: BoxFit.scaleDown,
                           image: story.photoUrl,
                           fit: BoxFit.cover,
+                          imageErrorBuilder: (context, error, stackTrace) {
+                            return Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              spacing: 8,
+                              children: [
+                                const Icon(
+                                  Icons.broken_image_rounded,
+                                  size: 48,
+                                ),
+                                const Text("Couldn't load image"),
+                              ],
+                            );
+                          },
                         ),
                       ),
                     ),

@@ -1,20 +1,19 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:narrativa/services/services.dart';
+import 'package:narrativa/static/static.dart';
 
 class AddStoryProvider extends ChangeNotifier {
-  String? _imagePath;
-  String? get imagePath => _imagePath;
-  set imagePath(String? value) {
-    _imagePath = value;
-    notifyListeners();
-  }
+  AddStoryProvider(this._apiService);
+  final ApiService _apiService;
 
-  XFile? _imageFile;
-  XFile? get imageFile => _imageFile;
-  set imageFile(XFile? value) {
-    _imageFile = value;
-    notifyListeners();
-  }
+  AddStoryState _state = AddStoryState();
+  AddStoryState get state => _state;
+
+  final TextEditingController _descriptionController = TextEditingController();
+  TextEditingController get descriptionController => _descriptionController;
 
   void openGalleryView() async {
     final isMacOS = defaultTargetPlatform == TargetPlatform.macOS;
@@ -26,8 +25,9 @@ class AddStoryProvider extends ChangeNotifier {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
-      imagePath = pickedFile.path;
-      imageFile = pickedFile;
+      _updateState(
+        _state.copyWith(image: pickedFile, status: AddStoryStatus.imagePicked),
+      );
     }
   }
 
@@ -39,14 +39,79 @@ class AddStoryProvider extends ChangeNotifier {
 
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.camera);
+
     if (pickedFile != null) {
-      imagePath = pickedFile.path;
-      imageFile = pickedFile;
+      _updateState(
+        _state.copyWith(image: pickedFile, status: AddStoryStatus.imagePicked),
+      );
     }
   }
 
   void clearImage() {
-    imagePath = null;
-    imageFile = null;
+    _updateState(AddStoryState());
+  }
+
+  void disposeController() {
+    _descriptionController.dispose();
+  }
+
+  Future<void> uploadStory({
+    required String token,
+    required String description,
+  }) async {
+    if (_state.image == null) {
+      _updateState(
+        _state.copyWith(
+          status: AddStoryStatus.error,
+          errorMessage: "Please select an image",
+        ),
+      );
+      return;
+    }
+
+    _updateState(_state.copyWith(status: AddStoryStatus.uploading));
+
+    try {
+      final response = await _apiService.addStory(
+        token: token,
+        description: description,
+        imageFile: _state.image!,
+      );
+
+      if (response.error) {
+        _updateState(
+          _state.copyWith(
+            status: AddStoryStatus.error,
+            errorMessage: response.message,
+          ),
+        );
+      }
+      _updateState(_state.copyWith(status: AddStoryStatus.uploadSuccess));
+    } on DioException catch (de) {
+      _updateState(
+        _state.copyWith(
+          status: AddStoryStatus.error,
+          errorMessage: _apiService.parseDioException(de),
+        ),
+      );
+    } catch (e) {
+      _updateState(
+        _state.copyWith(
+          status: AddStoryStatus.error,
+          errorMessage: e.toString(),
+        ),
+      );
+    }
+  }
+
+  _updateState(AddStoryState newState) {
+    _state = newState;
+    notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _descriptionController.dispose();
+    super.dispose();
   }
 }

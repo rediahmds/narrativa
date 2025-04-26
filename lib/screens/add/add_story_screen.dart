@@ -1,26 +1,26 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:narrativa/static/static.dart';
 import 'package:narrativa/ui/ui.dart';
 import 'package:provider/provider.dart';
 import 'package:narrativa/providers/providers.dart';
 
 class AddStoryScreen extends StatefulWidget {
-  const AddStoryScreen({super.key});
+  const AddStoryScreen({
+    super.key,
+    required this.onLogout,
+    required this.onUploaded,
+  });
+
+  final Function onLogout;
+  final Function onUploaded;
 
   @override
   State<AddStoryScreen> createState() => _AddStoryScreenState();
 }
 
 class _AddStoryScreenState extends State<AddStoryScreen> {
-  final _descriptionController = TextEditingController();
-
-  @override
-  void dispose() {
-    _descriptionController.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,8 +30,38 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
         width: MediaQuery.of(context).size.width,
         child: FilledButton.icon(
           icon: const Icon(Icons.send_rounded),
-          onPressed: () {},
-          label: const Text("Submit"),
+          label: const Text("Upload"),
+          onPressed: () async {
+            final sessionProvider = context.read<SessionProvider>();
+            final token = sessionProvider.state.loginResult?.token;
+            if (token == null) {
+              widget.onLogout();
+              return;
+            }
+
+            final addStoryProvider = context.read<AddStoryProvider>();
+            await addStoryProvider.uploadStory(
+              token: token,
+              description: addStoryProvider.descriptionController.text,
+            );
+
+            if (addStoryProvider.state.status == AddStoryStatus.error) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(addStoryProvider.state.errorMessage!)),
+              );
+            }
+
+            if (addStoryProvider.state.status == AddStoryStatus.uploadSuccess) {
+              addStoryProvider.descriptionController.clear();
+              addStoryProvider.clearImage();
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Story uploaded successfully")),
+              );
+
+              widget.onUploaded();
+            }
+          },
         ),
       ),
       floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
@@ -45,7 +75,7 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
                 child: Column(
                   spacing: 18,
                   children: [
-                    if (addStoryProvider.imagePath != null) ...[
+                    if (addStoryProvider.state.image != null) ...[
                       Container(
                         decoration: BoxDecoration(
                           border: Border.all(
@@ -56,7 +86,7 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(12),
                           child: Image.file(
-                            File(addStoryProvider.imagePath!),
+                            File(addStoryProvider.state.image!.path),
                             fit: BoxFit.contain,
                           ),
                         ),
@@ -93,7 +123,7 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
                     ConstrainedBox(
                       constraints: const BoxConstraints(maxHeight: 200),
                       child: NarrativaTextField(
-                        controller: _descriptionController,
+                        controller: addStoryProvider.descriptionController,
                         labelText: "Description",
                         textInputType: TextInputType.multiline,
                         expands: true,
@@ -107,7 +137,10 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
                         },
                       ),
                     ),
-                    const SizedBox(height: 18),
+                    const SizedBox(height: 12),
+                    if (addStoryProvider.state.status ==
+                        AddStoryStatus.uploading)
+                      const Center(child: CircularProgressIndicator()),
                   ],
                 ),
               );

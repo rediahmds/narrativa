@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:narrativa/models/models.dart';
 import 'package:narrativa/routes/app_paths.dart';
 
@@ -48,6 +49,30 @@ class ApiService {
     );
 
     return StoryDetailResponse.fromJson(response.toString());
+  }
+
+  Future<AddStoryResponse> addStory({
+    required String token,
+    required String description,
+    required XFile imageFile,
+  }) async {
+    final formData = FormData.fromMap({
+      "photo": await MultipartFile.fromFile(imageFile.path),
+      "description": description,
+    });
+
+    final response = await _dio.post(
+      AppPaths.stories.path,
+      data: formData,
+      options: Options(
+        headers: {
+          "Authorization": "Bearer $token",
+          "Content-Type": "multipart/form-data",
+        },
+      ),
+    );
+
+    return AddStoryResponse.fromJson(response.toString());
   }
 
   String parseDioException(DioException dioException) {

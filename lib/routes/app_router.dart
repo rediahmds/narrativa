@@ -51,7 +51,18 @@ class AppRouter {
               },
             ),
         routes: [
-          GoRoute(path: "/add", builder: (context, state) => AddStoryScreen()),
+          GoRoute(
+            path: "/add",
+            builder:
+                (context, state) => AddStoryScreen(
+                  onLogout: () {
+                    context.go(AppPaths.login.path);
+                  },
+                  onUploaded: () {
+                    context.go(AppPaths.stories.path);
+                  },
+                ),
+          ),
           GoRoute(
             path: "/:id",
             builder:

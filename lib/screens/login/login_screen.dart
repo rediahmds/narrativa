@@ -16,22 +16,14 @@ class LoginScreen extends StatelessWidget {
     return Scaffold(
       body: Center(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             spacing: 20,
             children: [
               Center(child: const Text('Welcome to Narrativa!')),
-              LoginForm(),
-              FilledButton(
-                onPressed: () => onLogin(),
-                child: const Text('Login'),
-              ),
-              OutlinedButton(
-                onPressed: () => onRegister(),
-                child: const Text('Register'),
-              ),
+              LoginForm(onLogin: onLogin, onRegister: onRegister),
             ],
           ),
         ),

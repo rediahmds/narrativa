@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:narrativa/models/models.dart';
 import 'package:narrativa/routes/app_paths.dart';
 
@@ -54,10 +53,11 @@ class ApiService {
   Future<AddStoryResponse> addStory({
     required String token,
     required String description,
-    required XFile imageFile,
+    required String imageName,
+    required List<int> imageBytesInt,
   }) async {
     final formData = FormData.fromMap({
-      "photo": await MultipartFile.fromFile(imageFile.path),
+      "photo": MultipartFile.fromBytes(imageBytesInt, filename: imageName),
       "description": description,
     });
 

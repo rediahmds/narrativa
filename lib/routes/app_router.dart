@@ -1,7 +1,9 @@
 import 'package:go_router/go_router.dart';
+import 'package:narrativa/providers/providers.dart';
 import 'package:narrativa/routes/routes.dart';
 import 'package:narrativa/screens/screens.dart';
 import 'package:narrativa/services/services.dart';
+import 'package:provider/provider.dart';
 
 class AppRouter {
   AppRouter(this._sessionService);
@@ -46,8 +48,17 @@ class AppRouter {
               onStoryTap: (String storyId) {
                 context.go("${AppPaths.stories.path}/$storyId");
               },
-              onAddStory: () {
-                context.go("${AppPaths.stories.path}/add");
+              onAddStory: () async {
+                final isRefresh = await context.push<bool>(
+                  "${AppPaths.stories.path}/add",
+                );
+                if (isRefresh == true && context.mounted) {
+                  final loginResult = _sessionService.loadSession();
+                  final token = loginResult?.token;
+                  if (token != null) {
+                    context.read<StoriesProvider>().fetchStories(token);
+                  }
+                }
               },
             ),
         routes: [
@@ -59,7 +70,7 @@ class AppRouter {
                     context.go(AppPaths.login.path);
                   },
                   onUploaded: () {
-                    context.go(AppPaths.stories.path);
+                    context.pop(true);
                   },
                 ),
           ),

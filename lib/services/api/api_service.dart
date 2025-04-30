@@ -55,10 +55,14 @@ class ApiService {
     required String description,
     required String imageName,
     required List<int> imageBytesInt,
+    double? lat,
+    double? lon,
   }) async {
     final formData = FormData.fromMap({
       "photo": MultipartFile.fromBytes(imageBytesInt, filename: imageName),
       "description": description,
+      "lat": lat ?? 6.1754,
+      "lon": lon ?? 106.8272,
     });
 
     final response = await _dio.post(

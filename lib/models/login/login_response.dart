@@ -1,6 +1,9 @@
-import 'dart:convert';
 import 'package:narrativa/models/models.dart';
+import 'package:json_annotation/json_annotation.dart';
 
+part 'login_response.g.dart';
+
+@JsonSerializable()
 class LoginResponse {
   final bool error;
   final String message;
@@ -12,10 +15,8 @@ class LoginResponse {
     required this.loginResult,
   });
 
-  factory LoginResponse.fromJson(String str) =>
-      LoginResponse.fromMap(json.decode(str));
-
-  String toJson() => json.encode(toMap());
+  factory LoginResponse.fromJson(Map<String, dynamic> json) => _$LoginResponseFromJson(json);
+  Map<String, dynamic> toJson() => _$LoginResponseToJson(this);
 
   factory LoginResponse.fromMap(Map<String, dynamic> json) => LoginResponse(
     error: json["error"],

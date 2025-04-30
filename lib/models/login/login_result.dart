@@ -1,5 +1,8 @@
-import 'dart:convert';
+import 'package:json_annotation/json_annotation.dart';
 
+part 'login_result.g.dart';
+
+@JsonSerializable()
 class LoginResult {
   final String? userId;
   final String name;
@@ -7,10 +10,9 @@ class LoginResult {
 
   LoginResult({required this.userId, required this.name, required this.token});
 
-  factory LoginResult.fromJson(String str) =>
-      LoginResult.fromMap(json.decode(str));
-
-  String toJson() => json.encode(toMap());
+  factory LoginResult.fromJson(Map<String, dynamic> json) =>
+      _$LoginResultFromJson(json);
+  Map<String, dynamic> toJson() => _$LoginResultToJson(this);
 
   factory LoginResult.fromMap(Map<String, dynamic> json) => LoginResult(
     userId: json["userId"],

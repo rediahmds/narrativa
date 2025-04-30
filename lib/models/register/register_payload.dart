@@ -1,5 +1,8 @@
-import 'dart:convert';
+import 'package:json_annotation/json_annotation.dart';
 
+part 'register_payload.g.dart';
+
+@JsonSerializable()
 class RegisterPayload {
   final String name;
   final String email;
@@ -11,10 +14,9 @@ class RegisterPayload {
     required this.password,
   });
 
-  factory RegisterPayload.fromJson(String str) =>
-      RegisterPayload.fromMap(json.decode(str));
-
-  String toJson() => json.encode(toMap());
+  factory RegisterPayload.fromJson(Map<String, dynamic> json) =>
+      _$RegisterPayloadFromJson(json);
+  Map<String, dynamic> toJson() => _$RegisterPayloadToJson(this);
 
   factory RegisterPayload.fromMap(Map<String, dynamic> json) => RegisterPayload(
     name: json["name"],

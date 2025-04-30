@@ -1,7 +1,9 @@
-import 'dart:convert';
-
 import 'package:narrativa/models/models.dart';
+import 'package:json_annotation/json_annotation.dart';
 
+part 'stories_response.g.dart';
+
+@JsonSerializable()
 class StoriesResponse {
   final bool error;
   final String message;
@@ -13,10 +15,9 @@ class StoriesResponse {
     required this.listStory,
   });
 
-  factory StoriesResponse.fromJson(String str) =>
-      StoriesResponse.fromMap(json.decode(str));
-
-  String toJson() => json.encode(toMap());
+  factory StoriesResponse.fromJson(Map<String, dynamic> json) =>
+      _$StoriesResponseFromJson(json);
+  Map<String, dynamic> toJson() => _$StoriesResponseToJson(this);
 
   factory StoriesResponse.fromMap(Map<String, dynamic> json) => StoriesResponse(
     error: json["error"],

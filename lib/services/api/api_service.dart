@@ -10,7 +10,7 @@ class ApiService {
       AppPaths.register.path,
       data: payload.toJson(),
     );
-    return RegisterResponse.fromJson(response.toString());
+    return RegisterResponse.fromJson(response.data);
   }
 
   Future<LoginResponse> login(LoginPayload payload) async {
@@ -18,7 +18,7 @@ class ApiService {
       AppPaths.login.path,
       data: payload.toJson(),
     );
-    return LoginResponse.fromJson(response.toString());
+    return LoginResponse.fromJson(response.data);
   }
 
   Future<StoriesResponse> getStories({
@@ -35,7 +35,7 @@ class ApiService {
       options: Options(headers: {"Authorization": "Bearer $token"}),
     );
 
-    return StoriesResponse.fromJson(response.toString());
+    return StoriesResponse.fromJson(response.data);
   }
 
   Future<StoryDetailResponse> getStoryDetail({
@@ -47,7 +47,7 @@ class ApiService {
       options: Options(headers: {"Authorization": "Bearer $token"}),
     );
 
-    return StoryDetailResponse.fromJson(response.toString());
+    return StoryDetailResponse.fromJson(response.data);
   }
 
   Future<AddStoryResponse> addStory({
@@ -72,7 +72,7 @@ class ApiService {
       ),
     );
 
-    return AddStoryResponse.fromJson(response.toString());
+    return AddStoryResponse.fromJson(response.data);
   }
 
   String parseDioException(DioException dioException) {

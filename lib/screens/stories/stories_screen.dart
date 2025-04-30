@@ -21,10 +21,11 @@ class StoriesScreen extends StatefulWidget {
 }
 
 class _StoriesScreenState extends State<StoriesScreen> {
+  final _scrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
-
     final sessionState = context.read<SessionProvider>().state;
     final token = sessionState.loginResult?.token;
 
@@ -33,8 +34,18 @@ class _StoriesScreenState extends State<StoriesScreen> {
       return;
     }
 
-    Future.microtask(() {
-      context.read<StoriesProvider>().fetchStories(token);
+    final storiesProvider = context.read<StoriesProvider>();
+
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels >=
+              _scrollController.position.maxScrollExtent &&
+          storiesProvider.page != null) {
+        storiesProvider.fetchStories(token);
+      }
+    });
+
+    Future.microtask(() async {
+      storiesProvider.fetchStories(token);
     });
   }
 
@@ -71,9 +82,18 @@ class _StoriesScreenState extends State<StoriesScreen> {
                 return const Center(child: Text('No stories available.'));
               }
 
+              int addedPages = storiesProvider.page != null ? 1 : 0;
               return ListView.builder(
-                itemCount: stories.length,
+                controller: _scrollController,
+                itemCount: stories.length + addedPages,
                 itemBuilder: (context, index) {
+                  if (index == stories.length && storiesProvider.page != null) {
+                    return const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Center(child: CircularProgressIndicator()),
+                    );
+                  }
+
                   final story = stories[index];
                   return StoryCardWidget(
                     story: story,

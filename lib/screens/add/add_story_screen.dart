@@ -52,12 +52,17 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
             }
 
             if (addStoryProvider.state.status == AddStoryStatus.uploadSuccess) {
+              final storiesProvider = context.read<StoriesProvider>();
+              storiesProvider.clearStories();
+
               addStoryProvider.descriptionController.clear();
               addStoryProvider.clearImage();
 
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text("Story uploaded successfully")),
               );
+
+              debugPrint("Story page value: ${storiesProvider.page}");
 
               widget.onUploaded();
             }

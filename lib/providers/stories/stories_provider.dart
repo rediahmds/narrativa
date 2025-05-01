@@ -10,9 +10,22 @@ class StoriesProvider extends ChangeNotifier {
 
   StoriesState _state = StoriesState();
   StoriesState get state => _state;
-  final List<Story> _stories = [];
 
-  int? page = 1;
+  final List<Story> _stories = [];
+  void clearStories() {
+    _stories.clear();
+    page = 1;
+    notifyListeners();
+  }
+
+  int? _page = 1;
+  set page(int? value) {
+    _page = value;
+    notifyListeners();
+  }
+
+  int? get page => _page;
+
   int size = 10;
 
   Future<void> fetchStories(String token) async {
@@ -39,10 +52,7 @@ class StoriesProvider extends ChangeNotifier {
 
       _stories.addAll(storiesResult.listStory);
       _updateState(
-        state.copyWith(
-          status: StoriesStatus.loaded,
-          stories: _stories,
-        ),
+        state.copyWith(status: StoriesStatus.loaded, stories: _stories),
       );
 
       page = storiesResult.listStory.length < size ? null : page! + 1;

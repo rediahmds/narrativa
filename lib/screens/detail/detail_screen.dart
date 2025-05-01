@@ -23,6 +23,8 @@ class DetailScreen extends StatefulWidget {
 }
 
 class _DetailScreenState extends State<DetailScreen> {
+  late GoogleMapController _mapController;
+
   @override
   void initState() {
     super.initState();
@@ -55,19 +57,76 @@ class _DetailScreenState extends State<DetailScreen> {
 
             case DetailStatus.loaded:
               final story = detailProvider.state.story!;
-              return Stack(
-                children: [
-                  GoogleMap(
-                    initialCameraPosition: CameraPosition(
-                      target: LatLng(
-                        story.lat ?? DefaultCoordinates.monas.lat,
-                        story.lon ?? DefaultCoordinates.monas.lon,
+
+              if (story.lat != null && story.lon != null) {
+                final coord = LatLng(story.lat!, story.lon!);
+                return Stack(
+                  children: [
+                    GoogleMap(
+                      mapToolbarEnabled: false,
+                      initialCameraPosition: CameraPosition(
+                        target: LatLng(coord.latitude, coord.longitude),
+                        zoom: 12,
                       ),
-                      zoom: 14,
+                      onMapCreated: (controller) {
+                        _mapController = controller;
+                        //  if error, try to define a provider
+                      },
+                      markers: {
+                        Marker(
+                          markerId: const MarkerId("story_location"),
+                          position: LatLng(story.lat!, story.lon!),
+                          onTap: () {
+                            _mapController.animateCamera(
+                              CameraUpdate.newLatLngZoom(coord, 20),
+                            );
+                          },
+                        ),
+                      },
                     ),
-                  ),
-                ],
-              );
+                    Positioned(
+                      bottom: 18,
+                      left: 0,
+                      right: 0,
+                      child: Card.filled(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(24),
+                        ),
+                        margin: const EdgeInsets.symmetric(horizontal: 18),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            StoryContent(story: story, showDescription: false),
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                left: 24,
+                                bottom: 8,
+                              ),
+                              child: FilledButton(
+                                onPressed: () {
+                                  showModalBottomSheet(
+                                    isScrollControlled: true,
+                                    showDragHandle: true,
+                                    context: context,
+                                    builder: (context) {
+                                      return SingleChildScrollView(
+                                        child: StoryContent(story: story),
+                                      );
+                                    },
+                                  );
+                                },
+                                child: const Text("View details"),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              }
+
+              return StoryContent(story: story);
 
             case DetailStatus.error:
             default:
@@ -99,9 +158,14 @@ class _DetailScreenState extends State<DetailScreen> {
 }
 
 class StoryContent extends StatelessWidget {
-  const StoryContent({super.key, required this.story});
+  const StoryContent({
+    super.key,
+    required this.story,
+    this.showDescription = true,
+  });
 
   final Story story;
+  final bool showDescription;
 
   @override
   Widget build(BuildContext context) {
@@ -143,12 +207,13 @@ class StoryContent extends StatelessWidget {
             ).textTheme.labelMedium?.copyWith(fontWeight: FontWeight.normal),
           ),
           const SizedBox(height: 8),
-          Text(
-            story.description,
-            maxLines: 4,
-            overflow: TextOverflow.ellipsis,
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
+          if (showDescription)
+            Text(
+              story.description,
+              maxLines: 4,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
         ],
       ),
     );

@@ -80,6 +80,52 @@ class _DetailScreenState extends State<DetailScreen> {
                             _mapController.animateCamera(
                               CameraUpdate.newLatLngZoom(coord, 20),
                             );
+
+                            final placemarks = await geocoding
+                                .placemarkFromCoordinates(
+                                  coord.latitude,
+                                  coord.longitude,
+                                );
+
+                            final placemark = placemarks.first;
+                            final administrativeArea =
+                                placemark.administrativeArea ?? "Unknown area";
+                            final street = placemark.street ?? "Unknown street";
+                            final country =
+                                placemark.country ?? "Unknown country";
+                            final postalCode =
+                                placemark.postalCode ?? "Unknown postal code";
+                            final city = placemark.locality ?? "Unknown city";
+
+                            showModalBottomSheet(
+                              context: context,
+                              builder: (context) {
+                                return Container(
+                                  width: MediaQuery.of(context).size.width - 36,
+                                  padding: const EdgeInsets.all(16),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        street,
+                                        style:
+                                            Theme.of(
+                                              context,
+                                            ).textTheme.titleLarge,
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        "$city, $administrativeArea, $country, $postalCode",
+                                        style:
+                                            Theme.of(
+                                              context,
+                                            ).textTheme.bodyMedium,
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            );
                           },
                         ),
                       },

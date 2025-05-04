@@ -78,28 +78,22 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
           child: Consumer<AddStoryProvider>(
             builder: (_, addStoryProvider, _) {
               final locationProviderWatch = context.watch<LocationProvider>();
-              final selectedLocation = locationProviderWatch.selectedLocation;
-              debugPrint(
-                "Selected location: ${selectedLocation?.toJson().toString()}",
-              );
 
               String address;
-              if (locationProviderWatch.locationState.status ==
-                  LocationStatus.fetching) {
-                address = "Fetching location...";
-              } else if (locationProviderWatch.locationState.status ==
-                  LocationStatus.error) {
-                address = "Error fetching location";
-              } else if (selectedLocation != null) {
-                address =
-                    "${selectedLocation.street}, ${selectedLocation.subLocality}, ${selectedLocation.locality}, ${selectedLocation.subAdministrativeArea}";
-              } else {
-                address = "No location selected";
+              switch (locationProviderWatch.locationState.status) {
+                case LocationStatus.initial:
+                  address = "Location not fetched yet";
+                  break;
+                case LocationStatus.retrieved:
+                  final placemark =
+                      locationProviderWatch.locationState.placemark!;
+                  address =
+                      "${placemark.street}, ${placemark.subLocality}, ${placemark.locality}, ${placemark.subAdministrativeArea}";
+                  break;
+                default:
+                  address = "Fetching location...";
               }
-              // final address =
-              //     selectedLocation != null
-              //         ? "${selectedLocation.street}, ${selectedLocation.subLocality}, ${selectedLocation.locality}, ${selectedLocation.subAdministrativeArea}"
-              //         : "No location selected";
+
               return Padding(
                 padding: const EdgeInsets.all(18),
                 child: Column(

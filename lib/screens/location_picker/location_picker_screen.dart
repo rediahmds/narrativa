@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:location/location.dart';
 import 'package:narrativa/providers/providers.dart';
 import 'package:narrativa/static/static.dart';
 import 'package:provider/provider.dart';
@@ -16,17 +17,6 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
   late GoogleMapController _controller;
   late final Set<Marker> _markers = {};
 
-  // @override
-  // void initState() {
-  //   super.initState();
-
-  //   final locationProvider = context.read<LocationProvider>();
-
-  //   Future.microtask(() async {
-  //     locationProvider.fetchLocation();
-  //   });
-  // }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,9 +32,9 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
 
             case LocationStatus.retrieved:
               final locationData = locationProvider.locationState.locationData!;
+              final placemark = locationProvider.locationState.placemark!;
               return Stack(
                 children: [
-                  // !FIX: initialCameraPosition always point to current location
                   GoogleMap(
                     initialCameraPosition: CameraPosition(
                       target: LatLng(
@@ -71,13 +61,24 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
                       });
                     },
                     onTap: (LatLng coord) async {
-                      final locationProvider = context.read<LocationProvider>();
+                      final newLocationData = LocationData.fromMap({
+                        "latitude": coord.latitude,
+                        "longitude": coord.longitude,
+                      });
                       final placemarks = await geocoding
                           .placemarkFromCoordinates(
                             coord.latitude,
                             coord.longitude,
                           );
-                      locationProvider.selectedLocation = placemarks.first;
+                      final placemark = placemarks.first;
+
+                      locationProvider.updateState(
+                        locationProvider.locationState.copyWith(
+                          locationData: newLocationData,
+                          placemark: placemark,
+                        ),
+                      );
+
                       setState(() {
                         _markers
                           ..clear()
@@ -100,25 +101,21 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
                     top: 12,
                     right: 12,
                     child: FloatingActionButton.small(
+                      tooltip: "My Location",
                       child: const Icon(Icons.my_location),
                       onPressed: () async {
+                        await locationProvider.setToCurrentLocation();
+                        final currentLocationData =
+                            locationProvider.locationState.locationData!;
+
                         _controller.animateCamera(
                           CameraUpdate.newLatLng(
                             LatLng(
-                              locationData.latitude!,
-                              locationData.longitude!,
+                              currentLocationData.latitude!,
+                              currentLocationData.longitude!,
                             ),
                           ),
                         );
-
-                        final locationProvider =
-                            context.read<LocationProvider>();
-                        final placemarks = await geocoding
-                            .placemarkFromCoordinates(
-                              locationData.latitude!,
-                              locationData.longitude!,
-                            );
-                        locationProvider.selectedLocation = placemarks.first;
 
                         setState(() {
                           _markers
@@ -127,8 +124,8 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
                               Marker(
                                 markerId: const MarkerId('selected-location'),
                                 position: LatLng(
-                                  locationData.latitude!,
-                                  locationData.longitude!,
+                                  currentLocationData.latitude!,
+                                  currentLocationData.longitude!,
                                 ),
                               ),
                             );
@@ -157,7 +154,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
                                     ),
                                   ),
                                   Text(
-                                    "${locationProvider.selectedLocation?.street}, ${locationProvider.selectedLocation?.subLocality}, ${locationProvider.selectedLocation?.locality}, ${locationProvider.selectedLocation?.subAdministrativeArea}",
+                                    "${placemark.street}, ${placemark.subLocality}, ${placemark.locality}, ${placemark.subAdministrativeArea}",
                                     style: const TextStyle(fontSize: 16),
                                   ),
                                 ],

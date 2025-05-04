@@ -9,23 +9,15 @@ class LocationProvider extends ChangeNotifier {
   LocationState _locationState = LocationState();
   LocationState get locationState => _locationState;
 
-  geocoding.Placemark? _selectedLocation;
-  geocoding.Placemark? get selectedLocation => _selectedLocation;
-
-  set selectedLocation(geocoding.Placemark? location) {
-    _selectedLocation = location;
-    notifyListeners();
-  }
-
   Future<void> fetchLocation() async {
-    _updateState(_locationState.copyWith(status: LocationStatus.fetching));
+    updateState(_locationState.copyWith(status: LocationStatus.fetching));
 
     try {
       final serviceEnabled = await _location.serviceEnabled();
       if (!serviceEnabled) {
         final serviceEnabledResult = await _location.requestService();
         if (!serviceEnabledResult) {
-          _updateState(
+          updateState(
             _locationState.copyWith(
               status: LocationStatus.error,
               errorMessage: "Location service is disabled",
@@ -39,7 +31,7 @@ class LocationProvider extends ChangeNotifier {
       if (permissionGranted == PermissionStatus.denied) {
         permissionGranted = await _location.requestPermission();
         if (permissionGranted != PermissionStatus.granted) {
-          _updateState(
+          updateState(
             _locationState.copyWith(
               status: LocationStatus.error,
               errorMessage: "Location permission denied",
@@ -54,16 +46,17 @@ class LocationProvider extends ChangeNotifier {
         locationData.latitude!,
         locationData.longitude!,
       );
-      selectedLocation = placemarks.first;
+      final placemark = placemarks.first;
 
-      _updateState(
+      updateState(
         _locationState.copyWith(
           status: LocationStatus.retrieved,
           locationData: locationData,
+          placemark: placemark,
         ),
       );
     } catch (e) {
-      _updateState(
+      updateState(
         _locationState.copyWith(
           status: LocationStatus.error,
           errorMessage: e.toString(),
@@ -72,7 +65,33 @@ class LocationProvider extends ChangeNotifier {
     }
   }
 
-  void _updateState(LocationState newState) {
+  Future<void> setToCurrentLocation() async {
+    try {
+      final locationData = await _location.getLocation();
+      final placemarks = await geocoding.placemarkFromCoordinates(
+        locationData.latitude!,
+        locationData.longitude!,
+      );
+      final placemark = placemarks.first;
+
+      updateState(
+        _locationState.copyWith(
+          locationData: locationData,
+          placemark: placemark,
+        ),
+      );
+    } catch (e) {
+      updateState(
+        _locationState.copyWith(
+          status: LocationStatus.error,
+          errorMessage: e.toString(),
+        ),
+      );
+      rethrow;
+    }
+  }
+
+  void updateState(LocationState newState) {
     _locationState = newState;
     notifyListeners();
   }

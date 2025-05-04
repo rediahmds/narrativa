@@ -72,7 +72,16 @@ class AppRouter {
                   onUploaded: () {
                     context.pop(true);
                   },
+                  onAddLocation: () {
+                    context.go("${AppPaths.stories.path}/add/location");
+                  },
                 ),
+            routes: [
+              GoRoute(
+                path: "/location",
+                builder: (context, state) => LocationPickerScreen(),
+              ),
+            ],
           ),
           GoRoute(
             path: "/:id",

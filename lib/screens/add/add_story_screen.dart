@@ -11,10 +11,12 @@ class AddStoryScreen extends StatefulWidget {
     super.key,
     required this.onLogout,
     required this.onUploaded,
+    required this.onAddLocation,
   });
 
   final Function onLogout;
   final Function onUploaded;
+  final Function onAddLocation;
 
   @override
   State<AddStoryScreen> createState() => _AddStoryScreenState();
@@ -75,6 +77,29 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
         child: SingleChildScrollView(
           child: Consumer<AddStoryProvider>(
             builder: (_, addStoryProvider, _) {
+              final locationProviderWatch = context.watch<LocationProvider>();
+              final selectedLocation = locationProviderWatch.selectedLocation;
+              debugPrint(
+                "Selected location: ${selectedLocation?.toJson().toString()}",
+              );
+
+              String address;
+              if (locationProviderWatch.locationState.status ==
+                  LocationStatus.fetching) {
+                address = "Fetching location...";
+              } else if (locationProviderWatch.locationState.status ==
+                  LocationStatus.error) {
+                address = "Error fetching location";
+              } else if (selectedLocation != null) {
+                address =
+                    "${selectedLocation.street}, ${selectedLocation.subLocality}, ${selectedLocation.locality}, ${selectedLocation.subAdministrativeArea}";
+              } else {
+                address = "No location selected";
+              }
+              // final address =
+              //     selectedLocation != null
+              //         ? "${selectedLocation.street}, ${selectedLocation.subLocality}, ${selectedLocation.locality}, ${selectedLocation.subAdministrativeArea}"
+              //         : "No location selected";
               return Padding(
                 padding: const EdgeInsets.all(18),
                 child: Column(
@@ -124,6 +149,15 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
                           child: const Text("Take a Photo"),
                         ),
                       ],
+                    ),
+                    ListTile(
+                      title: const Text("Location"),
+                      subtitle: Text(address),
+                      isThreeLine: true,
+                      trailing: const Icon(Icons.location_on_rounded),
+                      onTap: () {
+                        widget.onAddLocation();
+                      },
                     ),
                     ConstrainedBox(
                       constraints: const BoxConstraints(maxHeight: 200),

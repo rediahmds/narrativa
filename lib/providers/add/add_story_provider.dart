@@ -61,6 +61,8 @@ class AddStoryProvider extends ChangeNotifier {
   Future<void> uploadStory({
     required String token,
     required String description,
+    double? lat,
+    double? lon,
   }) async {
     if (_state.image == null) {
       _updateState(
@@ -88,6 +90,8 @@ class AddStoryProvider extends ChangeNotifier {
         description: description,
         imageName: _state.image!.path.split('/').last,
         imageBytesInt: imageBytesUint.toList(),
+        lat: lat,
+        lon: lon,
       );
 
       if (response.error) {

@@ -61,8 +61,8 @@ class ApiService {
     final formData = FormData.fromMap({
       "photo": MultipartFile.fromBytes(imageBytesInt, filename: imageName),
       "description": description,
-      "lat": lat ?? 6.1754,
-      "lon": lon ?? 106.8272,
+      if (lat != null) "lat": lat,
+      if (lon != null) "lon": lon,
     });
 
     final response = await _dio.post(

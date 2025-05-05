@@ -41,10 +41,15 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
               return;
             }
 
+            final locationProvider = context.read<LocationProvider>();
+            final locationData = locationProvider.locationState.locationData;
+
             final addStoryProvider = context.read<AddStoryProvider>();
             await addStoryProvider.uploadStory(
               token: token,
               description: addStoryProvider.descriptionController.text,
+              lat: locationData?.latitude,
+              lon: locationData?.longitude,
             );
 
             if (addStoryProvider.state.status == AddStoryStatus.error) {
@@ -60,11 +65,11 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
               addStoryProvider.descriptionController.clear();
               addStoryProvider.clearImage();
 
+              storiesProvider.fetchStories(token);
+
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text("Story uploaded successfully")),
               );
-
-              debugPrint("Story page value: ${storiesProvider.page}");
 
               widget.onUploaded();
             }

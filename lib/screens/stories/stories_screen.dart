@@ -85,7 +85,6 @@ class _StoriesScreenState extends State<StoriesScreen> {
               final stories = storiesProvider.state.stories;
 
               if (stories == null || stories.isEmpty) {
-                // !FIX: Showing empty state after adding a story
                 return const Center(child: Text('No stories available.'));
               }
 

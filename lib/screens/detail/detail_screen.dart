@@ -4,9 +4,9 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:narrativa/providers/providers.dart';
 import 'package:narrativa/routes/routes.dart';
 import 'package:narrativa/static/static.dart';
+import 'package:narrativa/utils/utils.dart';
 import 'package:provider/provider.dart';
 import 'package:narrativa/ui/ui.dart';
-import 'package:geocoding/geocoding.dart' as geocoding;
 
 class DetailScreen extends StatefulWidget {
   const DetailScreen({
@@ -80,21 +80,11 @@ class _DetailScreenState extends State<DetailScreen> {
                               CameraUpdate.newLatLngZoom(coord, 20),
                             );
 
-                            final placemarks = await geocoding
-                                .placemarkFromCoordinates(
-                                  coord.latitude,
-                                  coord.longitude,
+                            final address =
+                                await GeocodingFormat.getAddressFromLatLng(
+                                  lat: coord.latitude,
+                                  lon: coord.longitude,
                                 );
-
-                            final placemark = placemarks.first;
-                            final administrativeArea =
-                                placemark.administrativeArea ?? "Unknown area";
-                            final street = placemark.street ?? "Unknown street";
-                            final country =
-                                placemark.country ?? "Unknown country";
-                            final postalCode =
-                                placemark.postalCode ?? "Unknown postal code";
-                            final city = placemark.locality ?? "Unknown city";
 
                             showModalBottomSheet(
                               context: context,
@@ -106,7 +96,7 @@ class _DetailScreenState extends State<DetailScreen> {
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       Text(
-                                        street,
+                                        "Story Location",
                                         style:
                                             Theme.of(
                                               context,
@@ -114,7 +104,7 @@ class _DetailScreenState extends State<DetailScreen> {
                                       ),
                                       const SizedBox(height: 8),
                                       Text(
-                                        "$city, $administrativeArea, $country, $postalCode",
+                                        address,
                                         style:
                                             Theme.of(
                                               context,

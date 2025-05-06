@@ -2,11 +2,39 @@ import 'package:flutter/material.dart';
 import 'package:narrativa/models/models.dart';
 import 'package:narrativa/utils/utils.dart';
 
-class StoryCardWidget extends StatelessWidget {
+class StoryCardWidget extends StatefulWidget {
   const StoryCardWidget({super.key, required this.story, required this.onTap});
 
   final Story story;
   final void Function() onTap;
+
+  @override
+  State<StoryCardWidget> createState() => _StoryCardWidgetState();
+}
+
+class _StoryCardWidgetState extends State<StoryCardWidget> {
+  String? _address;
+
+  @override
+  void initState() {
+    super.initState();
+
+    Future.microtask(() async {
+      final lat = widget.story.lat;
+      final lon = widget.story.lon;
+      if (lat != null && lon != null) {
+        final address = await GeocodingFormat.getAddressFromLatLng(
+          lat: lat,
+          lon: lon,
+        );
+        if (mounted) {
+          setState(() {
+            _address = address;
+          });
+        }
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +43,7 @@ class StoryCardWidget extends StatelessWidget {
       child: Card.outlined(
         child: InkWell(
           borderRadius: BorderRadius.circular(12),
-          onTap: () => onTap(),
+          onTap: () => widget.onTap(),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             spacing: 8,
@@ -31,7 +59,7 @@ class StoryCardWidget extends StatelessWidget {
                     placeholder: "assets/loading-bean-eater.gif",
                     placeholderScale: .1,
                     placeholderFit: BoxFit.scaleDown,
-                    image: story.photoUrl,
+                    image: widget.story.photoUrl,
                     fit: BoxFit.cover,
                     imageErrorBuilder: (context, error, stackTrace) {
                       return Center(
@@ -55,28 +83,30 @@ class StoryCardWidget extends StatelessWidget {
                   spacing: 4,
                   children: [
                     Text(
-                      story.name,
+                      widget.story.name,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w700,
                       ),
                     ),
                     Text(
-                      story.description,
+                      widget.story.description,
                       style: Theme.of(context).textTheme.bodyMedium,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
                       JiffyFormat.relativeTime(
-                        story.createdAt.toIso8601String(),
+                        widget.story.createdAt.toIso8601String(),
                       ),
                       style: Theme.of(context).textTheme.labelMedium?.copyWith(
                         fontWeight: FontWeight.normal,
                       ),
                     ),
-                    if (story.lat != null && story.lon != null)
+                    if (widget.story.lat != null && widget.story.lon != null)
                       Text(
-                        'Location: ${story.lat}, ${story.lon}',
+                        _address != null
+                            ? "at ${_address!}"
+                            : "Loading address...",
                         style: Theme.of(context).textTheme.labelMedium
                             ?.copyWith(fontWeight: FontWeight.normal),
                       ),

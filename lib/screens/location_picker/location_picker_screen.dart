@@ -3,6 +3,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:narrativa/providers/providers.dart';
 import 'package:narrativa/static/static.dart';
+import 'package:narrativa/utils/utils.dart';
 import 'package:provider/provider.dart';
 import 'package:geocoding/geocoding.dart' as geocoding;
 
@@ -154,7 +155,9 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
                                     ),
                                   ),
                                   Text(
-                                    "${placemark.street}, ${placemark.subLocality}, ${placemark.locality}, ${placemark.subAdministrativeArea}",
+                                    GeocodingFormat.getAddressFromPlacemark(
+                                      placemark,
+                                    ),
                                     style: const TextStyle(fontSize: 16),
                                   ),
                                 ],

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:narrativa/static/static.dart';
 import 'package:narrativa/ui/ui.dart';
+import 'package:narrativa/utils/utils.dart';
 import 'package:provider/provider.dart';
 import 'package:narrativa/providers/providers.dart';
 
@@ -65,7 +66,7 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
               addStoryProvider.descriptionController.clear();
               addStoryProvider.clearImage();
 
-              storiesProvider.fetchStories(token);
+              await storiesProvider.fetchStories(token);
 
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text("Story uploaded successfully")),
@@ -92,8 +93,7 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
                 case LocationStatus.retrieved:
                   final placemark =
                       locationProviderWatch.locationState.placemark!;
-                  address =
-                      "${placemark.street}, ${placemark.subLocality}, ${placemark.locality}, ${placemark.subAdministrativeArea}";
+                  address = GeocodingFormat.getAddressFromPlacemark(placemark);
                   break;
                 default:
                   address = "Fetching location...";
